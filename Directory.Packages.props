@@ -7,7 +7,7 @@
     <!-- Static code analysis -->
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.33.0.1635" />
     <!-- Application -->
-    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Scrutor" Version="7.0.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
