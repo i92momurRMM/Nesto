@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharedKernel\Nesto.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

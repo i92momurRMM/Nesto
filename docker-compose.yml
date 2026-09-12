@@ -1,0 +1,55 @@
+services:
+  nesto-api:
+    image: ${DOCKER_REGISTRY-}nesto-api
+    container_name: nesto-api
+    build:
+      context: .
+      dockerfile: src/Web.Api/Dockerfile
+    depends_on:
+      nesto-db:
+        condition: service_healthy
+      nesto-cache:
+        condition: service_healthy
+    ports:
+      - 5000:8080
+      - 5001:8081
+
+  nesto-db:
+    image: postgres:17-alpine
+    container_name: nesto-db
+    environment:
+      - POSTGRES_DB=nesto
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - nesto-db-data:/var/lib/postgresql/data
+    ports:
+      - 5440:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nesto"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  nesto-cache:
+    image: redis:7.4-alpine
+    container_name: nesto-cache
+    ports:
+      - 6380:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  nesto-seq:
+    image: datalust/seq:2024.3
+    container_name: nesto-seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 8082:80
+      - 5342:5341
+
+volumes:
+  nesto-db-data:
