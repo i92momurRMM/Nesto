@@ -11,13 +11,14 @@ namespace Nesto.IntegrationTests;
 public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder("postgres:17-alpine")
-        .WithDatabase("nesto")
+        .WithDatabase("nestocleanarquitecture")
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
         builder.UseSetting("ConnectionStrings:Database", _dbContainer.GetConnectionString());
         builder.UseSetting("ConnectionStrings:Cache", string.Empty);
 
@@ -28,6 +29,7 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
 
         builder.UseSetting("RateLimiting:Global:PermitLimit", "100000");
         builder.UseSetting("RateLimiting:Authentication:PermitLimit", "100000");
+        builder.UseSetting("Cors:AllowedOrigins:0", "http://localhost:4200");
     }
 
     public async Task InitializeAsync()

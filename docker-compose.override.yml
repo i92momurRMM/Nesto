@@ -1,15 +1,9 @@
 services:
-  nesto-api:
+  nesto-cleanarquitecture-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__Database=Host=nesto-db;Port=5432;Database=nesto;Username=postgres;Password=postgres;Include Error Detail=true
+      - ConnectionStrings__Database=Host=nesto-postgres;Port=5432;Database=nestocleanarquitecture;Username=postgres;Password=postgres;Include Error Detail=true;GSS Encryption Mode=Disable
       - ConnectionStrings__Cache=nesto-cache:6379
       - Serilog__WriteTo__1__Args__ServerUrl=http://nesto-seq:5341
-    ports:
-      - "8080"
-      - "8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - SeedData__HostPassword=NestoHost123!

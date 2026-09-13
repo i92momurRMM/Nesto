@@ -1,6 +1,6 @@
 # Nesto Clean .NET 10
 
-API-only apartment booking system built with .NET 10, Clean Architecture, DDD and CQRS. It preserves the functionality of the Gabriel variant while replacing its licensed or unnecessary dependencies with small interfaces and free open-source components.
+Apartment booking API built with .NET 10 and Clean Architecture. It preserves the functionality using free open-source components.
 
 ## Main decisions
 
@@ -107,12 +107,16 @@ The versioned API is exposed below `/api/v1`:
 
 Resource-level authorization prevents users from reading or changing records they do not own.
 
+## CORS
+
+The API CORS policy reads an explicit `Cors:AllowedOrigins` list. Development allows the Angular origins on `localhost:4200`; production must provide its own trusted origins through configuration. Credentials and arbitrary origins are never enabled together.
+
 ## Run locally
 
 Requirements: .NET 10 SDK and Docker.
 
 ```bash
-docker compose up -d nesto-db nesto-cache nesto-seq
+docker compose up -d nesto-postgres nesto-cache nesto-seq
 dotnet run --project src/Web.Api/Nesto.Api.csproj --launch-profile http
 ```
 
@@ -122,7 +126,11 @@ dotnet run --project src/Web.Api/Nesto.Api.csproj --launch-profile http
 - PostgreSQL: `localhost:5440`
 - Redis: `localhost:6380`
 
-Development startup applies migrations and seeds sample apartments. Secrets and production connection strings must be supplied through environment variables or a secret store.
+Docker Compose uses the project name `nesto`, which groups all related containers under Nesto in Docker Desktop. The API container is named `nesto-cleanarquitecture-api`. The shared PostgreSQL server is `nesto-postgres`; this implementation owns the `nestocleanarquitecture` database. Other API implementations may reuse the PostgreSQL server, but each must own a different database and its own migrations, Identity and Outbox tables.
+
+Development startup applies migrations and seeds sample apartments. Local password-based connections explicitly disable GSS encryption because Kerberos is not part of the development environment. Production must choose and configure TLS or GSS/Kerberos explicitly; secrets and production connection strings must be supplied through environment variables or a secret store.
+
+The sample apartments belong to the development host account `host@nesto.local`. Docker Compose supplies its local password as `NestoHost123!` through `SeedData__HostPassword`; a locally launched API must provide the same setting through an environment variable or .NET user secrets. Use a separate guest account to reserve a stay, then sign in as the sample host to confirm or reject that booking. These credentials are created only in the Development environment and must never be used outside local development.
 
 To run the complete stack in containers:
 

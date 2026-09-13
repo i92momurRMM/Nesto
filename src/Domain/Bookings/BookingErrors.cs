@@ -23,4 +23,8 @@ public static class BookingErrors
     public static readonly Error NotCompleted = Error.Conflict(
         "Bookings.NotCompleted",
         "The stay has not ended yet.");
+
+    public static readonly Error NotApartmentOwner = Error.Forbidden(
+        "Bookings.NotApartmentOwner",
+        "Only the apartment owner can manage this booking.");
 }

@@ -1,32 +1,35 @@
+name: nesto
+
 services:
-  nesto-api:
-    image: ${DOCKER_REGISTRY-}nesto-api
-    container_name: nesto-api
+  nesto-cleanarquitecture-api:
+    image: ${DOCKER_REGISTRY-}nesto-cleanarquitecture-api
+    container_name: nesto-cleanarquitecture-api
     build:
       context: .
       dockerfile: src/Web.Api/Dockerfile
     depends_on:
-      nesto-db:
+      nesto-postgres:
         condition: service_healthy
       nesto-cache:
         condition: service_healthy
     ports:
       - 5000:8080
-      - 5001:8081
-
-  nesto-db:
-    image: postgres:17-alpine
-    container_name: nesto-db
     environment:
-      - POSTGRES_DB=nesto
+      - ASPNETCORE_HTTP_PORTS=8080
+
+  nesto-postgres:
+    image: postgres:17-alpine
+    container_name: nesto-postgres
+    environment:
+      - POSTGRES_DB=nestocleanarquitecture
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - nesto-db-data:/var/lib/postgresql/data
+      - nesto-postgres-data:/var/lib/postgresql/data
     ports:
       - 5440:5432
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d nesto"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nestocleanarquitecture"]
       interval: 3s
       timeout: 3s
       retries: 20
@@ -52,4 +55,4 @@ services:
       - 5342:5341
 
 volumes:
-  nesto-db-data:
+  nesto-postgres-data:

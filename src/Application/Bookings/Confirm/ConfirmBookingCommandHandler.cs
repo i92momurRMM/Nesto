@@ -4,7 +4,6 @@ using Nesto.Application.Abstractions.Messaging;
 using Nesto.Domain.Apartments;
 using Nesto.Domain.Bookings;
 using Nesto.SharedKernel;
-using Nesto.Domain.Users;
 
 namespace Nesto.Application.Bookings.Confirm;
 
@@ -28,7 +27,7 @@ internal sealed class ConfirmBookingCommandHandler(
 
         if (apartment?.OwnerId != userContext.UserId)
         {
-            return Result.Failure(UserErrors.Unauthorized());
+            return Result.Failure(BookingErrors.NotApartmentOwner);
         }
 
         Result result = booking.Confirm(dateTimeProvider.UtcNow);

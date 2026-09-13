@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Nesto.IntegrationTests.Bookings;
 
@@ -155,6 +156,29 @@ public sealed class BookingsTests(IntegrationTestWebAppFactory factory) : BaseIn
         BookingResponse? booking = await read.Content.ReadFromJsonAsync<BookingResponse>();
 
         booking!.Status.ShouldBe(4); // Cancelled
+    }
+
+    [Fact]
+    public async Task Confirm_ByGuest_ReturnsOwnerSpecificForbiddenError()
+    {
+        (Guid ownerId, _) = await RegisterAndLoginAsync();
+        Guid apartmentId = await SeedApartmentAsync(ownerId: ownerId);
+        (_, AccessTokens guest) = await RegisterAndLoginAsync();
+        Authenticate(guest.AccessToken);
+
+        HttpResponseMessage reserved = await HttpClient.PostAsJsonAsync(
+            "bookings",
+            new { apartmentId, startDate = Start, endDate = End });
+        Guid bookingId = await reserved.Content.ReadFromJsonAsync<Guid>();
+
+        HttpResponseMessage confirmed = await HttpClient.PutAsync(
+            new Uri($"bookings/{bookingId}/confirm", UriKind.Relative), content: null);
+
+        confirmed.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        ProblemDetails? problem = await confirmed.Content.ReadFromJsonAsync<ProblemDetails>();
+        problem.ShouldNotBeNull();
+        problem.Title.ShouldBe("Bookings.NotApartmentOwner");
+        problem.Detail.ShouldBe("Only the apartment owner can manage this booking.");
     }
 
     [Fact]
